@@ -1,0 +1,52 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: egunar <egunar@student.42istanbul.com.tr>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/01/09 12:23:42 by egunar            #+#    #+#             */
+/*   Updated: 2022/05/17 18:49:25 by egunar           ###   ########.tr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "get_next_line_bonus.h"
+
+char	*oku_ve_al(int fd, char *full_str)
+{
+	char	*buff;
+	int		read_buff;
+
+	buff = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if (!buff)
+		return (NULL);
+	read_buff = 1;
+	while (!(ft_strchr(full_str, '\n')) && read_buff != 0)
+	{
+		read_buff = read(fd, buff, BUFFER_SIZE);
+		if (read_buff == -1)
+		{
+			free(buff);
+			return (NULL);
+		}
+		buff[read_buff] = '\0';
+		full_str = ft_strjoin(full_str, buff);
+	}
+	free(buff);
+	return (full_str);
+}
+
+char	*get_next_line(int fd)
+{
+	static char	*full_str[1024];
+	char		*str;
+
+	if (fd < 0 || BUFFER_SIZE <= 0 || fd >= 1024)
+		return (0);
+	full_str[fd] = oku_ve_al(fd, full_str[fd]);
+	if (full_str[fd] == NULL)
+		return (NULL);
+	str = just_line(full_str[fd]);
+	full_str[fd] = destroy_before_nl(full_str[fd]);
+	return (str);
+}
